@@ -33,16 +33,16 @@ render("The Doom Reaper", "slant")
 print("Doom reaper is a webscrapper software based on BBC1 playlist")
 
 #this function is  used to get the authentification 
+
 def auth():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="0403872f14e443248bc24988540275b8",
                                                client_secret="8c2e08a92513423d8d60bba51589cd01",
                                                redirect_uri="http://www.google.com",
                                                scope="playlist-modify user-read-private"))
     return sp 
-
 #This function is used to scrap the daniel p.carter show and get the url of the show of the week. 
 def get_link_homepage():
-    url = "https://www.bbc.co.uk/programmes/b006ww0v/episodes/player"
+    url = "https://www.bbc.co.uk/programmes/b006wq4s/episodes/player"
     req = Request(url)
     html_page = urlopen(req)
     soup = BeautifulSoup(html_page, "lxml")
@@ -53,18 +53,17 @@ def get_link_homepage():
 
     for link in soup.findAll('a'):
         links.append(link.get('href'))
-    
+
     for i in links: 
         if i != None : 
-            links_without_none.append(i)
-        
+            links_without_none.append(i) 
     
     sounds_url = [x for x in links_without_none if x.startswith(start_url)]
     return (sounds_url[0])
-    print(sounds_url[0])
+
 
 #this function stock_data() scrap the data on the BBC1 website and create a list ready to be search in spotify
-def stock_data():
+def songs_list():
     url = get_link_homepage()
     r = requests.get(url)
     soup = BeautifulSoup(r.text,'lxml')
@@ -84,11 +83,11 @@ def stock_data():
         lst.append("artist:"+ i + " track:"+ j)
 
     return lst
-
+ 
 # Get playlist tracks 
 def get_playlist_tracks():
     user="bmpse4fdqb4lo6bzn0h81zxkq"
-    playlist_id="5zkWZJlfo3dvUHguNp54At"
+    playlist_id="3sJi9B5v8RNfJQ5TmRG0dv"
     sp = auth()
     track_list = []
     playlist_tracks = sp.user_playlist_tracks(user, playlist_id, fields='items,uri,name,id,total', market='fr')
@@ -100,9 +99,6 @@ def get_playlist_tracks():
     print(json.dumps(playlist_tracks, indent = 2 ))
     #for i in playlist_tracks:
         
-
-
-   
     #print(playlist_tracks)
 # Call the track deletion function
 
@@ -111,11 +107,21 @@ def playlist_remove_tracks():
     track_ids = "spotify:track:16Elz7HJPLZPMylp13ewxv"
     #sp.user_playlist_remove_all_occurrences_of_tracks(user="bmpse4fdqb4lo6bzn0h81zxkq", playlist_id="3sJi9B5v8RNfJQ5TmRG0dv", tracks_ids)
 
+
+def remove_nested_parens():
+    track_list = songs_list()
+    cool_list = []
+    for i in track_list:
+        track = re.sub(r'\([^)]*\)', '', i)
+        cool_list.append(track)
+    return cool_list
+    
+
 #tracklist 
 def track_lst_creator():
     track_lst = []
     sp = auth()
-    lst = stock_data()
+    lst = remove_nested_parens()
     error_counter = 0
     for i in lst:
         search = sp.search(q=i, limit=1, offset=0, type='track', market=None)
@@ -126,15 +132,17 @@ def track_lst_creator():
             uri = songs[0]["uri"]
             track_lst.append(uri)
     print(" ---------------- There was "+str(error_counter)+" error")
-    sp.user_playlist_add_tracks(user="bmpse4fdqb4lo6bzn0h81zxkq", playlist_id="5zkWZJlfo3dvUHguNp54At", tracks=track_lst, position=None)
+    sp.user_playlist_add_tracks(user="bmpse4fdqb4lo6bzn0h81zxkq", playlist_id="3sJi9B5v8RNfJQ5TmRG0dv", tracks=track_lst, position=None)
 
 #get_playlist_tracks()
 
 #playlist_remove_tracks()
 
-get_link_homepage()
+track_lst_creator()
 
 
 
 
-#track_lst_creator()
+
+
+
