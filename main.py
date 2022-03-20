@@ -1,16 +1,10 @@
-import os
-import sys
+
 import json
 import spotipy
-import webbrowser
 import requests
-
 from bs4 import BeautifulSoup 
 import spotipy.util as util
 from json.decoder import JSONDecodeError
-import urllib3
-import pyfiglet
-
 from spotipy.oauth2 import SpotifyOAuth
 from pyfiglet import Figlet
 from requests.utils import quote
@@ -20,7 +14,6 @@ user_ID= "bmpse4fdqb4lo6bzn0h81zxkq"
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 import re
-import tldextract
 
 #This is the function for the cool banner. 
 
@@ -31,6 +24,7 @@ def render(text, style):
 render("The Doom Reaper", "slant") 
 
 print("Doom reaper is a webscrapper software based on BBC1 playlist")
+
 
 #this function is  used to get the authentification 
 
@@ -59,7 +53,7 @@ def get_link_homepage():
             links_without_none.append(i) 
     
     sounds_url = [x for x in links_without_none if x.startswith(start_url)]
-    return (sounds_url[0])
+    return(sounds_url[0])
 
 
 #this function stock_data() scrap the data on the BBC1 website and create a list ready to be search in spotify
@@ -67,23 +61,27 @@ def songs_list():
     url = get_link_homepage()
     r = requests.get(url)
     soup = BeautifulSoup(r.text,'lxml')
-    title = soup.select("title")
-    track = soup.findAll("p",{"class":"sc-c-basic-tile__title sc-u-truncate gel-long-primer gs-u-pr-alt@m"},)
-    artist = soup.findAll("p",{"class":"sc-c-basic-tile__artist sc-u-truncate gel-pica-bold gs-u-pr-alt@m gs-u-mb--"},)
+    title = soup.p
+    track = soup.find_all("p")
+    artist = soup.find_all("p",{"class":"sc-c-basic-tile__artist sc-u-truncate gel-pica-bold gs-u-pr-alt@m gs-u-mb--"},)
     track_lst = []
     artist_lst = []
     lst = []
-
     for item in track:
         track_lst.append(item.text)
     for item in artist:
         artist_lst.append(item.text)
-    
+
     for i,j in zip(artist_lst,track_lst):
         lst.append("artist:"+ i + " track:"+ j)
+    print(lst)
+    
 
-    return lst
- 
+#{"class":"sc-c-basic-tile__title sc-u-truncate gel-long-primer gs-u-pr-alt@m"}
+
+    
+
+
 # Get playlist tracks 
 def get_playlist_tracks():
     user="bmpse4fdqb4lo6bzn0h81zxkq"
@@ -135,10 +133,14 @@ def track_lst_creator():
     sp.user_playlist_add_tracks(user="bmpse4fdqb4lo6bzn0h81zxkq", playlist_id="3sJi9B5v8RNfJQ5TmRG0dv", tracks=track_lst, position=None)
 
 #get_playlist_tracks()
-
 #playlist_remove_tracks()
 
-track_lst_creator()
+#track_lst_creator()
+
+songs_list()
+
+
+
 
 
 
